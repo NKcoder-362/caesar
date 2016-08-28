@@ -15,8 +15,8 @@
 # limitations under the License.
 #
 import webapp2
-from caesar import  encrypt
-import cgi
+from caesar import  encrypt  # used to encrypt data
+import cgi           # used to escape bad input from user
 
 form="""
 <form method="post"  >
@@ -50,14 +50,16 @@ class MainPage(webapp2.RequestHandler): #generic req handler from google
         raw = self.request.get("raw")
 
         if not rotate.isdigit():   #validate rotate as number
-            self.response.write ("Rotate must be a whole number")
+            self.response.write ("Rotate must be a number")
             return
         rotate = int(rotate)
 
-        raw = cgi.escape(raw)
-
-        result = encrypt(raw,rotate)
-
+        raw = cgi.escape(raw)  #any bad data entered into the textarea called raw
+                                #will be "escaped"(turned into plain text)
+        result = encrypt(raw,rotate)  # this calls the function encrypt,
+                                    #the data entered into the form fields raw,rotate
+                                    #are put into the required parameters for the function
+                                    #and returns encrypted text into the text area called raw
         self.formwrite(rotate, result)
 
 #get text from text area

@@ -20,52 +20,41 @@ import cgi
 
 form="""
 <form method="post"  >
-<label for "rotate">Rotate by:
-    <input name ="rotate" type = "text" value = "%(rotate)s">
+<label for "Rotate">Rotate by:
+    <input name ="rotate" type = "number" value = "%(rotate)s">
 </label>
 <br>
 <br>
-<textarea type = "text" name="raw"
-          style="height:100px; width:400px;">%(raw)s</textarea>
+<textarea type = "text" name="text"
+          style="height:100px; width:400px;">{%(text)s}</textarea>
 <br>
 <br>
 <input type = "submit" name = "Submit Query">
-
 </form>
 """  # ends variable named form
 class MainPage(webapp2.RequestHandler): #generic req handler from google
-
-    def formwrite(self, rotate="", raw=""):  # sets var default values to ""
-        replacements = {"rotate" : rotate, "raw" : raw} # dictionary - replace "" w/user input
-        self.response.write(form % replacements)
-
 #create write form function
 #should accept form , and rotate and text as parameters with empty default values
 
-    def get(self):
-        self.formwrite()
-
+#auto changes example to abc if nothing is provided
+    def get(self, example = "abc"):
+        #self.response.headers['Content-Type'] = 'text/plain'
+        self.response.write(form) #changed from printing "hello world"
+                                    #to printing the form
     def post(self):
         rotate = self.request.get("rotate")
-        raw = self.request.get("raw")
-
-        if not rotate.isdigit():   #validate rotate as number
-            self.response.write ("Rotate must be a whole number")
-            return
+        text = self.request.get ("text")
         rotate = int(rotate)
+        answer = encrypt(text,rotate)
+        close = cgi.escape(answer)
+        self.response.write(form % {"text":answer})
 
-        raw = cgi.escape(raw)
-
-        result = encrypt(raw,rotate)
-
-        self.formwrite(rotate, result)
-
+#validate rotate as number
 #get text from text area
 #escape text area text ie text_area_text = cgi.escape(text_area_text)
 #call encrypt using rotate
 #call write form function with rotate and encrypted text passed in
 #        self.response.out.write(rotate)
-
 
 app = webapp2.WSGIApplication([('/', MainPage)  ],# 1 URL '/', that maps to handler called MainPage
                                 debug=True)  #this is the URL mapping section.
